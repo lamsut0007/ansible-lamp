@@ -86,7 +86,7 @@
   ansible.builtin.replace:
     path: /etc/pam.d/su
     regexp: '^#\s*auth\s+required\s+pam_wheel\.so\s+use_uid'
-    replace: 'auth           required        pam_wheel.so use_uid'
+    replace: 'auth            required        pam_wheel.so use_uid'
     backup: yes
 
 # core dump

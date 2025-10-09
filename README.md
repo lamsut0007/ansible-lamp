@@ -7,7 +7,7 @@ This repository contains Ansible playbooks for system hardening and configuratio
 Before running the playbook, ensure that:
 
 - Ansible is installed on your local machine.
-- You have SSH access to the target servers.
+- You need to fill your information to `inventory/hosts.ini` file.
 - You know the `sudo` password for the target servers (if required).
 
 ## About Playbooks

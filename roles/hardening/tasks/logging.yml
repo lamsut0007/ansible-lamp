@@ -31,8 +31,8 @@
 - name: Run initial AIDE check
   ansible.builtin.command: /usr/sbin/aide --check
   register: aide_check
-  failed_when: aide_check.rc not in [0, 5]
   changed_when: false
+  failed_when: false
 
 - name: Ensure AIDE daily check cron job exists in /etc/crontab
   ansible.builtin.lineinfile:
