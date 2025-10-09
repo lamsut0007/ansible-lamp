@@ -1,9 +1,9 @@
 ---
-# - import_tasks: accounts.yml
-# - import_tasks: password.yml
-# - import_tasks: permissions.yml
-# - import_tasks: logging.yml
-# - import_tasks: network.yml
-# - import_tasks: modules.yml
-# - import_tasks: ssh.yml
+- import_tasks: accounts.yml
+- import_tasks: password.yml
+- import_tasks: permissions.yml
+- import_tasks: logging.yml
+- import_tasks: network.yml
+- import_tasks: modules.yml
+- import_tasks: ssh.yml
 - import_tasks: audit.yml
