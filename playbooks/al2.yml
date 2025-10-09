@@ -1,7 +1,7 @@
 ---
 - name: Linux Server Security Hardening
-  hosts: all
+  hosts: al2
   become: true
 
   roles:
-    - hardening
+    - al2-hardening

@@ -1,0 +1,7 @@
+---
+- name: Linux Server Security Hardening
+  hosts: al23
+  become: true
+
+  roles:
+    - al23-hardening
