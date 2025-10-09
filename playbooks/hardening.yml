@@ -1,0 +1,7 @@
+---
+- name: Linux Server Security Hardening
+  hosts: all
+  become: true
+
+  roles:
+    - hardening

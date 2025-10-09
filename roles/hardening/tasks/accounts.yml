@@ -1,0 +1,69 @@
+---
+- name: Check for non-root UID 0 accounts
+  command: | 
+    awk -F: '($3 == 0) { print $1 }' /etc/passwd
+  register: uid_zero_accounts
+  changed_when: false
+
+- debug:
+    msg: "UID 0 accounts other than root: {{ uid_zero_accounts.stdout_lines }}"
+
+- name: Restrict allowed TTYs in /etc/securetty
+  copy:
+    dest: /etc/securetty
+    content: |
+      console
+      vc/1
+      vc/2
+      vc/3
+      vc/4
+      vc/5
+      vc/6
+      vc/7
+      vc/8
+      vc/9
+      vc/10
+      vc/11
+      tty1
+      tty2
+      tty3
+      tty4
+      tty5
+      tty6
+      ttyS0
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Ensure no accounts with empty password fields
+  command: |
+    awk -F: '($2 == "") { print $1 }' /etc/shadow
+  register: empty_pw_accounts
+  changed_when: false
+
+- debug:
+    msg: "Accounts with empty passwords: {{ empty_pw_accounts.stdout_lines }}"
+
+- name: Ensure proper umask system default
+  lineinfile:
+    path: /etc/rc.d/init.d/functions
+    regexp: '^umask'
+    line: 'umask 027'
+    backup: yes
+
+- name: Set /etc/issue banner
+  ansible.builtin.template:
+    src: issue.j2
+    dest: /etc/issue
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Set /etc/motd banner
+  ansible.builtin.template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: '0644'
+

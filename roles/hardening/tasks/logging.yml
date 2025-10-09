@@ -1,0 +1,69 @@
+---
+- name: Ensure crontab (cronie) is installed
+  ansible.builtin.package:
+    name: "{{ 'cronie' if ansible_os_family == 'RedHat' else 'cron' }}"
+    state: present
+
+- name: Ensure $FileCreateMode 0640 in /etc/rsyslog.conf
+  ansible.builtin.lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^\$FileCreateMode'
+    line: '$FileCreateMode 0640'
+    create: yes
+    backup: yes
+
+- name: Ensure AIDE is installed
+  ansible.builtin.package:
+    name: aide
+    state: present
+
+- name: Initialize AIDE database
+  ansible.builtin.shell: /usr/sbin/aide --init
+  args:
+    creates: /var/lib/aide/aide.db.new.gz
+
+- name: Move initialized AIDE DB into place
+  ansible.builtin.command: mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+  args:
+    removes: /var/lib/aide/aide.db.new.gz
+    creates: /var/lib/aide/aide.db.gz
+
+- name: Run initial AIDE check
+  ansible.builtin.command: /usr/sbin/aide --check
+  register: aide_check
+  failed_when: aide_check.rc not in [0, 5]
+  changed_when: false
+
+- name: Ensure AIDE daily check cron job exists in /etc/crontab
+  ansible.builtin.lineinfile:
+    path: /etc/crontab
+    regexp: 'aide --check'
+    line: '0 5 * * * root /usr/sbin/aide --check'
+    insertafter: EOF
+    create: yes
+    backup: yes
+
+# Jornal
+- name: Configure journald settings
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^ForwardToSyslog='
+    line: 'ForwardToSyslog=yes'
+    state: present
+
+- ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^Compress='
+    line: 'Compress=yes'
+    state: present
+
+- ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^Storage='
+    line: 'Storage=persistent'
+    state: present
+
+- name: Restart systemd-journald to apply changes
+  ansible.builtin.systemd:
+    name: systemd-journald
+    state: restarted

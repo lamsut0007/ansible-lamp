@@ -1,0 +1,33 @@
+---
+- name: Disable SCTP module
+  copy:
+    src: sctp.conf
+    dest: /etc/modprobe.d/sctp.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Disable cramfs, squashfs, udf
+  copy:
+    src: CIS.conf
+    dest: /etc/modprobe.d/CIS.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Disable USB storage
+  copy:
+    src: usb-storage.conf
+    dest: /etc/modprobe.d/usb-storage.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ensure floppy disk mount restriction exists
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    regexp: '^/dev/fd0'
+    line: '/dev/fd0   /media/floppy0   auto   rw,user,noauto,nosuid,nodev,noexec,utf8   0   0'
+    state: present
+
+

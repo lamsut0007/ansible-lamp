@@ -1,0 +1,101 @@
+---
+
+- name: Restrict /etc/hosts* from being world-writable
+  file:
+    path: /etc/hosts
+    mode: '0644'
+
+- name: Fix ownership of root dotfiles
+  ansible.builtin.find:
+    paths: /root
+    patterns: ".*"
+    file_type: file
+  register: root_dotfiles
+
+- name: Set ownership and permissions for root dotfiles
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: root
+    group: root
+    mode: '0600'
+  loop: "{{ root_dotfiles.files }}"
+
+- name: Fix ownership of user home dotfiles
+  ansible.builtin.find:
+    paths: /home
+    patterns: ".*"
+    file_type: file
+  register: home_dotfiles
+
+- name: Set permissions for home dotfiles
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: '0600'
+  loop: "{{ home_dotfiles.files }}"
+
+### Root path
+- name: Backup root .bashrc if not already
+  copy:
+    src: /root/.bashrc
+    dest: "/root/.bashrc.bak.{{ ansible_date_time.date }}"
+    remote_src: yes
+    owner: root
+    group: root
+    mode: '0644'
+  ignore_errors: yes
+
+- name: Ensure root PATH is correctly set in .bashrc
+  blockinfile:
+    path: /root/.bashrc
+    block: |
+      # Set root default PATH
+      PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+      export PATH
+    marker: "# {mark} ANSIBLE MANAGED ROOT PATH"
+
+- name: Apply root PATH immediately for current session
+  shell: "source /root/.bashrc && echo $PATH"
+  register: root_path
+  changed_when: false
+
+- debug:
+    msg: "Root PATH is set to {{ root_path.stdout }}"
+
+### Cron
+- name: Ensure Cron is installed
+  ansible.builtin.package:
+    name: cronie
+    state: present
+
+- name: Backup all /etc/*cron* files and directories
+  ansible.builtin.shell: |
+    tar -cvpzf /etc/backup-cron-{{ ansible_date_time.day }}-{{ ansible_date_time.month }}-{{ ansible_date_time.year }}.tar.gz /etc/*cron* 2>/dev/null || true
+  args:
+    executable: /bin/bash
+
+- name: Restrict all /etc/*cron* permissions to 600
+  ansible.builtin.shell: |
+    find /etc -maxdepth 1 -name "*cron*" -exec chmod 600 {} \;
+
+- name: Set backup cron files permission to 644
+  ansible.builtin.shell: |
+    find /etc -maxdepth 1 -name "backup-cron*" -exec chmod 644 {} \;
+
+# su command
+- name: Require members of wheel group to use su (uncomment pam_wheel.so line)
+  ansible.builtin.replace:
+    path: /etc/pam.d/su
+    regexp: '^#\s*auth\s+required\s+pam_wheel\.so\s+use_uid'
+    replace: 'auth           required        pam_wheel.so use_uid'
+    backup: yes
+
+# core dump
+- name: Disable core dumps for all users
+  ansible.builtin.copy:
+    dest: /etc/security/limits.d/core-dump.conf
+    content: |
+      * hard core 0
+    owner: root
+    group: root
+    mode: '0644'
+

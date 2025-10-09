@@ -1,0 +1,25 @@
+---
+- name: Disable and stop rpcbind service
+  ansible.builtin.service:
+    name: rpcbind
+    state: stopped
+    enabled: no
+
+- name: Apply IPv4 hardening
+  template:
+    src: sysctl_ipv4.conf.j2
+    dest: /etc/sysctl.d/02-ipv4.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Apply IPv6 hardening
+  template:
+    src: sysctl_ipv6.conf.j2
+    dest: /etc/sysctl.d/03-ipv6.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload sysctl
+  command: sysctl --system
