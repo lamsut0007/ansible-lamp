@@ -1,0 +1,30 @@
+---
+  - name: Ensure Docker is installed
+    package:
+      name: docker
+      state: present
+
+  - name: Ensure Docker service is running
+    service:
+      name: docker
+      state: started
+      enabled: true
+
+  - name: Pull Zabbix agent Docker image
+    community.docker.docker_image:
+      name: zabbix/zabbix-agent
+      tag: alpine-3.2.0
+      source: pull
+
+  - name: Run Zabbix agent container
+    community.docker.docker_container:
+      name: zabbix-agent
+      image: zabbix/zabbix-agent:alpine-3.2.0
+      state: started
+      restart_policy: always
+      env:
+        ZBX_HOSTNAME: "zabbix"
+        ZBX_SERVER_HOST: "54.169.2.144"
+      published_ports:
+        - "10050:10050"
+      init: true

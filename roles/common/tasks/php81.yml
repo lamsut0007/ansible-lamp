@@ -1,0 +1,79 @@
+# ---
+#   - name: Remove existing PHP packages
+#     yum:
+#       name: "php*"
+#       state: absent
+
+#   - name: Install Remi repository
+#     yum:
+#       name: https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+#       state: present
+
+#   - name: Enable Remi PHP 8.1 stream
+#     shell: |
+#       dnf module reset php -y
+#       dnf module enable php:remi-8.1 -y
+
+#   - name: Install PHP 8.1 and required extensions
+#     yum:
+#       name:
+#         - php
+#         - php-bcmath
+#         - php-bz2
+#         - php-calendar
+#         - php-cli
+#         - php-common
+#         - php-curl
+#         - php-devel
+#         - php-exif
+#         - php-fileinfo
+#         - php-fpm
+#         - php-gd
+#         - php-intl
+#         - php-json
+#         - php-mbstring
+#         - php-mysqlnd
+#         - php-opcache
+#         - php-pdo
+#         - php-pdo_mysql
+#         - php-pdo_sqlite
+#         - php-readline
+#         - php-sockets
+#         - php-sqlite3
+#         - php-tokenizer
+#         - php-xml
+#         - php-xmlreader
+#         - php-xmlwriter
+#         - php-xsl
+#         - php-zip
+#         - php-zlib
+#       state: present
+
+#   - name: Install build deps for imagick
+#     yum:
+#       name:
+#         - php-pear
+#         - gcc
+#         - ImageMagick
+#         - ImageMagick-devel
+#         - php-devel
+#       state: present
+
+#   - name: Install imagick via pecl
+#     shell: |
+#       yes '' | pecl install -f imagick
+#     args:
+#       creates: /usr/lib64/php/modules/imagick.so
+
+#   - name: Enable imagick extension
+#     copy:
+#       dest: /etc/php.d/20-imagick.ini
+#       content: "extension=imagick.so\n"
+#       owner: root
+#       group: root
+#       mode: '0644'
+
+#   - name: Restart php-fpm
+#     systemd:
+#       name: php-fpm
+#       state: restarted

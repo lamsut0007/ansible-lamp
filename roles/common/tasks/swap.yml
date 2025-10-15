@@ -1,0 +1,38 @@
+- name: Turn off all swap
+  ansible.builtin.command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+  ignore_errors: true
+
+- name: Create 6GB swap file
+  ansible.builtin.command: dd if=/dev/zero of=/swapfile bs=1M count=6144
+  args:
+    creates: /swapfile
+
+- name: Ensure data is written to disk
+  ansible.builtin.command: sync
+
+- name: Set correct permissions for swap file
+  ansible.builtin.file:
+    path: /swapfile
+    mode: '0600'
+
+- name: Make swap on the file
+  ansible.builtin.command: mkswap /swapfile
+
+- name: Enable swap
+  ansible.builtin.command: swapon /swapfile
+  register: swapon_result
+  failed_when: swapon_result.rc != 0 and 'already active' not in swapon_result.stderr
+  changed_when: "'already active' not in swapon_result.stderr"
+
+- name: Verify swap is active
+  ansible.builtin.command: swapon --show
+  register: swap_check
+  changed_when: false
+
+- name: Add swap entry to /etc/fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: '/swapfile none swap sw 0 0'
+    state: present
+    backup: yes
