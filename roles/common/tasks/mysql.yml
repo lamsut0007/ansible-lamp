@@ -1,0 +1,46 @@
+---
+    - name: Import MySQL GPG key
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+
+    - name: Download MySQL 8.4 community repo (EL9)
+      ansible.builtin.get_url:
+        url: https://repo.mysql.com/mysql84-community-release-el9-2.noarch.rpm
+        dest: /tmp/mysql84-community-release-el9-2.noarch.rpm
+
+    - name: Install MySQL Yum repo package
+      ansible.builtin.yum:
+        name: /tmp/mysql84-community-release-el9-2.noarch.rpm
+        state: present
+
+    - name: Disable default MySQL module if exists
+      ansible.builtin.shell: |
+        dnf module list mysql -y >/dev/null 2>&1 && dnf module disable mysql -y || echo "no module"
+      args:
+        executable: /bin/bash
+      register: disable_module_result
+      changed_when: "'Disabling module' in disable_module_result.stdout"
+      ignore_errors: true
+
+    - name: Clean yum cache
+      ansible.builtin.command: dnf clean all
+
+    - name: Enable correct repo (8.4 LTS)
+      ansible.builtin.command: dnf config-manager --enable mysql-8.4-lts-community
+      ignore_errors: true
+
+    - name: Install MySQL 8.4 LTS client (latest 8.4.x)
+      ansible.builtin.yum:
+        name: mysql-community-client
+        state: present
+        enablerepo: mysql-8.4-lts-community
+
+    - name: Verify MySQL client version
+      ansible.builtin.command: mysql --version
+      register: mysql_cli_version
+      changed_when: false
+
+    - name: Show installed MySQL client version
+      ansible.builtin.debug:
+        msg: "{{ mysql_cli_version.stdout }}"

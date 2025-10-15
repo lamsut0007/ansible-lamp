@@ -1,5 +1,5 @@
 ---
-  - name: Install PHP 8.1 and common extensions
+  - name: Install PHP and common extensions
     yum:
       name:
         - php
@@ -65,9 +65,9 @@
         - ImageMagick-devel
       state: present
 
-  - name: Install imagick via pecl
+  - name: Install imagick 3.7.0 via pecl
     shell: |
-      yes '' | pecl install -f imagick
+      yes '' | pecl install -f imagick-3.7.0 || true
     args:
       creates: /usr/lib64/php/modules/imagick.so
 
