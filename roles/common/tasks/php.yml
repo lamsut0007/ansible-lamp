@@ -55,6 +55,14 @@
         - php-zlib
       state: present
 
+  - name: Check PHP version
+    command: php -v
+    register: php_version
+
+  - name: Show PHP version
+    debug:
+      msg: "{{ php_version.stdout }}"
+
   - name: Install build dependencies for imagick
     yum:
       name:

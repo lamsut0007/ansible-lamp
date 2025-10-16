@@ -1,5 +1,5 @@
 ---
-- name: Linux Server Security Hardening
+- name: Initialize and configure servers
   hosts: app1
   become: true
 
