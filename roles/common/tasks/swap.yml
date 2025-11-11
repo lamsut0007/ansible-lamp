@@ -1,3 +1,4 @@
+---
 - name: Turn off all swap
   ansible.builtin.command: swapoff -a
   when: ansible_swaptotal_mb > 0

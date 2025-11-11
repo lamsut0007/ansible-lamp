@@ -1,5 +1,7 @@
 ---
-# - import_tasks: swap.yml
-# - import_tasks: zabbix.yml
-- import_tasks: mysql.yml # con loi
-# - import_tasks: php.yml # con loi
+- import_tasks: apache.yml
+- import_tasks: php.yml
+- import_tasks: mariadb.yml
+- import_tasks: cron.yml
+- import_tasks: zabbix.yml
+- import_tasks: swap.yml

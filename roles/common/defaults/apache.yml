@@ -1,0 +1,4 @@
+apache_packages:
+  - httpd
+  - mod_ssl
+  - httpd-tools

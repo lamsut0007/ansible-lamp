@@ -1,0 +1,4 @@
+zabbix_hostname: "zabbix"
+zabbix_server_host: "54.169.2.144"
+zabbix_port: "10050"
+zabbix_image: "zabbix/zabbix-agent:alpine-3.2.0"

@@ -1,0 +1,44 @@
+---
+- name: Load Apache defaults
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/defaults/apache.yml"
+
+- name: Update DNF metadata
+  ansible.builtin.dnf:
+    update_cache: yes
+  changed_when: false
+
+- name: Install Apache and modules
+  ansible.builtin.dnf:
+    name: "{{ apache_packages }}"
+    state: present
+
+- name: Enable and start Apache service
+  ansible.builtin.systemd:
+    name: httpd
+    enabled: true
+    state: started
+
+- name: Check Apache version
+  ansible.builtin.command: httpd -v
+  register: apache_version
+  changed_when: false
+
+- name: Display Apache version info
+  ansible.builtin.debug:
+    msg: "{{ apache_version.stdout }}"
+
+# Optional: Configure firewall for HTTP and HTTPS
+# - name: Ensure firewall allows HTTP and HTTPS traffic
+#   ansible.builtin.firewalld:
+#     service: "{{ item }}"
+#     permanent: yes
+#     state: enabled
+#   loop:
+#     - http
+#     - https
+#   when: ansible_facts.services is defined
+
+# - name: Reload firewall
+#   ansible.builtin.command: firewall-cmd --reload
+#   ignore_errors: yes

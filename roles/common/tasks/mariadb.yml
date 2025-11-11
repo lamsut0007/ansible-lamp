@@ -1,0 +1,29 @@
+---
+  - name: Load MariaDB defaults
+    ansible.builtin.include_vars:
+      file: "{{ role_path }}/defaults/mariadb.yml"
+
+  - name: Update DNF metadata
+    ansible.builtin.command: dnf makecache
+
+  - name: Install MariaDB server and client
+    ansible.builtin.dnf:
+      name:
+        - "mariadb{{ mariadb_version }}-server"
+        - "mariadb{{ mariadb_version }}"
+      state: present
+
+  - name: Enable and start MariaDB service
+    ansible.builtin.systemd:
+      name: mariadb
+      enabled: true
+      state: started
+
+  - name: Show MariaDB (MySQL) version
+    ansible.builtin.command: mysql --version
+    register: mysql_version
+    changed_when: false
+
+  - name: Display version info
+    ansible.builtin.debug:
+      msg: "{{ mysql_version.stdout }}"

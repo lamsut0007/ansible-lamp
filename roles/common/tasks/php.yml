@@ -1,93 +1,48 @@
 ---
-  - name: Install PHP and common extensions
-    yum:
-      name:
-        - php
-        - php-bcmath
-        - php-bz2
-        - php-calendar
-        - php-cli
-        - php-common
-        - php-ctype
-        - php-curl
-        - php-date
-        - php-dom
-        - php-exif
-        - php-fileinfo
-        - php-filter
-        - php-ftp
-        - php-gd
-        - php-gettext
-        - php-hash
-        - php-iconv
-        - php-intl
-        - php-json
-        - php-libxml
-        - php-mbstring
-        - php-mysqli
-        - php-mysqlnd
-        - php-openssl
-        - php-pcntl
-        - php-pcre
-        - php-pdo
-        - php-pdo_mysql
-        - php-pdo_sqlite
-        - php-phar
-        - php-posix
-        - php-readline
-        - php-reflection
-        - php-session
-        - php-shmop
-        - php-simplexml
-        - php-sockets
-        - php-spl
-        - php-sqlite3
-        - php-standard
-        - php-sysvmsg
-        - php-sysvsem
-        - php-sysvshm
-        - php-tokenizer
-        - php-xml
-        - php-xmlreader
-        - php-xmlwriter
-        - php-xsl
-        - php-zip
-        - php-zlib
-      state: present
+- name: Load PHP defaults
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/defaults/php.yml"
 
-  - name: Check PHP version
-    command: php -v
-    register: php_version
+- name: Install PHP and extensions
+  ansible.builtin.dnf:
+    name: "{{ php_packages }}"
+    state: present
 
-  - name: Show PHP version
-    debug:
-      msg: "{{ php_version.stdout }}"
+- name: Check PHP version
+  ansible.builtin.command: php -v
+  register: php_version
 
-  - name: Install build dependencies for imagick
-    yum:
-      name:
-        - php-pear
-        - php-devel
-        - gcc
-        - ImageMagick
-        - ImageMagick-devel
-      state: present
+- name: Show PHP version
+  ansible.builtin.debug:
+    msg: "{{ php_version.stdout }}"
 
-  - name: Install imagick 3.7.0 via pecl
-    shell: |
-      yes '' | pecl install -f imagick-3.7.0 || true
-    args:
-      creates: /usr/lib64/php/modules/imagick.so
+- name: Install dependencies for Imagick
+  ansible.builtin.dnf:
+    name: "{{ php_imagick_dependencies }}"
+    state: present
 
-  - name: Enable imagick extension
-    copy:
-      dest: /etc/php.d/20-imagick.ini
-      content: "extension=imagick.so\n"
-      owner: root
-      group: root
-      mode: '0644'
+- name: Install Imagick {{ php_imagick_version }} via PECL
+  ansible.builtin.shell: |
+    yes '' | pecl install -f imagick-{{ php_imagick_version }} || true
+  register: pecl_imagick
+  changed_when: "'already installed' not in pecl_imagick.stdout"
 
-  - name: Restart php-fpm service
-    systemd:
-      name: php-fpm
-      state: restarted
+- name: Find imagick.so file
+  ansible.builtin.find:
+    paths: /usr/lib64/php{{ php_version_full }}/modules
+    patterns: imagick.so
+  register: imagick_module
+
+- name: Enable Imagick extension
+  ansible.builtin.copy:
+    dest: /etc/php.d/20-imagick.ini
+    content: "extension={{ imagick_module.files[0].path }}\n"
+    owner: root
+    group: root
+    mode: '0644'
+  when: imagick_module.matched > 0
+
+- name: Restart php-fpm service
+  ansible.builtin.systemd:
+    name: php-fpm
+    state: restarted

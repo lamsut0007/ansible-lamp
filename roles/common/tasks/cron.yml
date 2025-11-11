@@ -1,0 +1,20 @@
+---
+  - name: Install and enable cron service
+    ansible.builtin.dnf:
+      name: cronie
+      state: present
+
+  - name: Enable and start cron service
+    ansible.builtin.systemd:
+      name: crond
+      enabled: true
+      state: started
+
+  - name: Verify cron is running
+    ansible.builtin.command: systemctl status crond
+    register: cron_status
+    changed_when: false
+
+  - name: Display cron service status
+    ansible.builtin.debug:
+      msg: "{{ cron_status.stdout_lines | select('search', 'Active:') | list }}"
