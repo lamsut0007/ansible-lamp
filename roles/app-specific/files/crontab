@@ -1,0 +1,25 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+
+#0 0 * * * root bash -l /root/backup.sh
+
+#Cohomes admin cron
+#0 9 * * * apache php /var/www/html/cohomes-admin/yii generate-ticket > /tmp/cronlog/cohomes-admin-op-genticket-`date +\%F`.txt 2>&1
+#*/5 * * * * apache php /var/www/html/cohomes-admin/yii queue/run > /tmp/cronlog/cohomes-admin-queue-`date +\%F`.txt 2>&1
+#0 0 * * * apache php /var/www/html/cohomes-admin/yii booking-scheduler/run > /tmp/cronlog/cohomes-admin-booking-scheduler-`date +\%F`.txt 2>&1
+#0 11 * * * apache php /var/www/html/cohomes-admin/yii booking-scheduler/booking-reminder > /tmp/cronlog/cohomes-admin-booking-reminder-`date +\%F`.txt 2>&1
+
+#AIDE
+0 5 * * * /usr/sbin/aide --check

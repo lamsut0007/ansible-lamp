@@ -1,0 +1,23 @@
+- name: Ensure Python 3 is installed
+  package:
+    name: python3
+    state: present
+
+- name: Ensure pip3 is installed
+  package:
+    name: python3-pip
+    state: present
+
+- name: Install AWS CLI v2 via pip
+  pip:
+    name: awscli
+    executable: pip3
+    state: latest
+
+- name: Verify AWS CLI installation
+  command: aws --version
+  register: aws_cli_version
+  changed_when: false
+
+- debug:
+    msg: "AWS CLI version installed: {{ aws_cli_version.stdout }}"
