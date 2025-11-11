@@ -5,4 +5,5 @@
 
   roles:
     - hardening
-    #- common
+    - app-common
+    - app-specific
