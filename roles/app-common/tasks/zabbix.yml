@@ -32,7 +32,7 @@
     state: started
     restart_policy: always
     env:
-      ZBX_HOSTNAME: "{{ env_vars.zabbix_hostname | default(zabbix/zabbix-agent:alpine-3.2.0) }}"
+      ZBX_HOSTNAME: "{{ env_vars.zabbix_hostname | default('zabbix/zabbix-agent:alpine-3.2.0') }}"
       ZBX_SERVER_HOST: "{{ env_vars.zabbix_server_host | default(54.169.2.144) }}"
     published_ports:
       - "{{ env_vars.zabbix_port | default(10050) }}:{{ env_vars.zabbix_port | default(10050) }}"

@@ -1,0 +1,8 @@
+- name: Deploy crontab configuration
+  ansible.builtin.copy:
+    src: crontab               
+    dest: /etc/crontab
+    owner: root
+    group: root
+    mode: '0644'
+  become: true

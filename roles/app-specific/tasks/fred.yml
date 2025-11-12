@@ -1,28 +1,25 @@
-- name: Ensure fred user exists and .ssh directory created
-  hosts: all
-  become: yes
-  tasks:
-    - name: Ensure user fred exists
-      ansible.builtin.user:
-        name: fred
-        groups: apache
-        append: yes
-        shell: /bin/bash
-        create_home: yes
-        state: present
+---
+  - name: Ensure user fred exists
+    ansible.builtin.user:
+      name: fred
+      groups: apache
+      append: yes
+      shell: /bin/bash
+      create_home: yes
+      state: present
 
-    - name: Ensure .ssh directory exists for fred
-      ansible.builtin.file:
-        path: /home/fred/.ssh
-        state: directory
-        owner: fred
-        group: fred
-        mode: '0700'
+  - name: Ensure .ssh directory exists for fred
+    ansible.builtin.file:
+      path: /home/fred/.ssh
+      state: directory
+      owner: fred
+      group: fred
+      mode: '0700'
 
-    - name: Copy sudoers file for fred
-      ansible.builtin.copy:
-        src: fred/sudoers
-        dest: /etc/sudoers.d/fred
-        owner: root
-        group: root
-        mode: '0640'
+  - name: Copy sudoers file for fred
+    ansible.builtin.copy:
+      src: fred/sudoers
+      dest: /etc/sudoers.d/fred
+      owner: root
+      group: root
+      mode: '0640'

@@ -1,0 +1,15 @@
+- name: Create backup_env.sh with environment variables
+  ansible.builtin.copy:
+    dest: /etc/profile.d/backup_env.sh
+    content: |
+      export MYSQL_PASS="{{ env_vars.mysql_pass | default('') }}"
+      export ZIP_PASS="{{ env_vars.zip_pass | default('') }}"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Load backup_env.sh variables into current session
+  ansible.builtin.shell: . /etc/profile.d/backup_env.sh
+  args:
+    executable: /bin/bash
+  become: true

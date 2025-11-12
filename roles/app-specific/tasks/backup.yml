@@ -1,0 +1,8 @@
+- name: Copy backup.sh to /root
+  ansible.builtin.copy:
+    src: backup.sh
+    dest: /root/backup.sh
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
