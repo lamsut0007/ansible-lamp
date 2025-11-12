@@ -1,9 +1,13 @@
 ---
 - name: Initialize and configure servers
-  hosts: app1
+  hosts: "{{ target_hosts | default('app1') }}"
   become: true
 
-  roles:
-    - hardening
-    - app-common
-    - app-specific
+  vars_files:
+    - ./env.yml
+
+  tasks:
+    - name: Apply roles from env.yml
+      include_role:
+        name: "{{ item }}"
+      loop: "{{ roles_to_apply | default(['app-common']) }}"

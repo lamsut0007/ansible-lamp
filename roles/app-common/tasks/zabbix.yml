@@ -22,18 +22,18 @@
 
 - name: Pull Zabbix agent Docker image
   community.docker.docker_image:
-    name: "{{ env_vars.ZABBIX_IMAGE | default(zabbix_image) }}"
+    name: "{{ env_vars.zabbix_image | default(zabbix_image) }}"
     source: pull
 
 - name: Run Zabbix agent container
   community.docker.docker_container:
     name: zabbix-agent
-    image: "{{ env_vars.ZABBIX_IMAGE | default(zabbix_image) }}"
+    image: "{{ env_vars.zabbix_image | default(zabbix_image) }}"
     state: started
     restart_policy: always
     env:
-      ZBX_HOSTNAME: "{{ env_vars.ZABBIX_HOSTNAME | default(zabbix_hostname) }}"
-      ZBX_SERVER_HOST: "{{ env_vars.ZABBIX_SERVER_HOST | default(zabbix_server_host) }}"
+      ZBX_HOSTNAME: "{{ env_vars.zabbix_hostname | default(zabbix/zabbix-agent:alpine-3.2.0) }}"
+      ZBX_SERVER_HOST: "{{ env_vars.zabbix_server_host | default(54.169.2.144) }}"
     published_ports:
-      - "{{ env_vars.ZABBIX_PORT | default(zabbix_port) }}:{{ env_vars.ZABBIX_PORT | default(zabbix_port) }}"
+      - "{{ env_vars.zabbix_port | default(10050) }}:{{ env_vars.zabbix_port | default(10050) }}"
     init: true

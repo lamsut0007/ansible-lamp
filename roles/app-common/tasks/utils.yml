@@ -1,0 +1,49 @@
+---
+  - name: Install zip, unzip and git
+    ansible.builtin.dnf:
+      name:
+        - zip
+        - unzip
+        - git
+      state: present
+
+  - name: Verify zip version
+    ansible.builtin.command: zip -v
+    register: zip_version
+    changed_when: false
+
+  - name: Display zip version
+    ansible.builtin.debug:
+      msg: "{{ zip_version.stdout_lines[0] }}"
+
+  - name: Verify unzip version
+    ansible.builtin.command: unzip -v
+    register: unzip_version
+    changed_when: false
+
+  - name: Display unzip version
+    ansible.builtin.debug:
+      msg: "{{ unzip_version.stdout_lines[0] }}"
+
+  - name: Verify git version
+    ansible.builtin.command: git --version
+    register: git_version
+    changed_when: false
+
+  - name: Display git version
+    ansible.builtin.debug:
+      msg: "{{ git_version.stdout_lines[0] }}"
+
+  - name: Install OpenSSL
+    ansible.builtin.dnf:
+      name: openssl
+      state: present
+
+  - name: Check OpenSSL version
+    ansible.builtin.command: openssl version
+    register: openssl_version
+    changed_when: false
+
+  - name: Display OpenSSL version
+    ansible.builtin.debug:
+      msg: "{{ openssl_version.stdout }}"
