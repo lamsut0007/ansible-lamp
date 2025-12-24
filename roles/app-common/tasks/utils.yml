@@ -47,3 +47,17 @@
   - name: Display OpenSSL version
     ansible.builtin.debug:
       msg: "{{ openssl_version.stdout }}"
+
+  - name: Install rsync
+    ansible.builtin.dnf:
+      name: rsync
+      state: present
+
+  - name: Verify rsync version
+    ansible.builtin.command: rsync --version
+    register: rsync_version
+    changed_when: false
+
+  - name: Display rsync version
+    ansible.builtin.debug:
+      msg: "{{ rsync_version.stdout_lines[0] }}"
