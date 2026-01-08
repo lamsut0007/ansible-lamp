@@ -1,0 +1,40 @@
+- name: Ensure /etc/pki/tls/private exists
+  ansible.builtin.file:
+    path: /etc/pki/tls/private
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Copy private cert/key files
+  ansible.builtin.copy:
+    src: private/
+    dest: /etc/pki/tls/private/
+    owner: root
+    group: root
+    mode: '0600'
+  register: private_files
+
+- name: Copy httpd.conf
+  ansible.builtin.copy:
+    src: httpd/httpd.conf
+    dest: /etc/httpd/conf/httpd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  register: httpd_conf
+
+- name: Copy ssl.conf
+  ansible.builtin.copy:
+    src: httpd/ssl.conf
+    dest: /etc/httpd/conf.d/ssl.conf
+    owner: root
+    group: root
+    mode: '0644'
+  register: ssl_conf
+
+- name: Reload httpd if config or cert changed
+  ansible.builtin.service:
+    name: httpd
+    state: reloaded
+  when: private_files.changed or httpd_conf.changed or ssl_conf.changed

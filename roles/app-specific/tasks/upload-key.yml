@@ -1,0 +1,15 @@
+- name: Ensure .ssh directory exists for ec2-user
+  ansible.builtin.file:
+    path: /home/ec2-user/.ssh
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0700'
+
+- name: Copy ssh key for rsync
+  ansible.builtin.copy:
+    src: vsp-cohomes-key-new.pem
+    dest: /home/ec2-user/.ssh/vsp-cohomes-key-new.pem
+    owner: ec2-user
+    group: ec2-user
+    mode: '0600'

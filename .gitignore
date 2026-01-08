@@ -2,3 +2,5 @@
 .env
 env.yml
 inventory/hosts.yml
+private
+fred

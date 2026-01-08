@@ -1,6 +1,8 @@
 ---
 - import_tasks: set-env.yml
-- import_tasks: fred.yml
 - import_tasks: aws.yml
 - import_tasks: backup.yml
 - import_tasks: crontab.yml
+- import_tasks: upload-key.yml
+- import_tasks: httpd.yml
+- import_tasks: fred.yml

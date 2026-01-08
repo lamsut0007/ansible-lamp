@@ -18,7 +18,7 @@
 
   - name: Copy sudoers file for fred
     ansible.builtin.copy:
-      src: fred/sudoers
+      src: sudoers-fred
       dest: /etc/sudoers.d/fred
       owner: root
       group: root
